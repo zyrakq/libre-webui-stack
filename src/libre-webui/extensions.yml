@@ -1,0 +1,25 @@
+version: "1.0"
+groups:
+  providers:
+    description: "AI Providers"
+    extensions:
+      - openrouter
+
+  step-ca:
+    description: "smallstep-ca"
+    extensions:
+      - step-ca-trust
+conflicts:
+combinations:
+  - name: "openrouter+step-ca-trust"
+    extensions: ["openrouter","step-ca-trust"]
+    description: "-"
+
+naming:
+  separator: "+"
+  sort: true 
+
+metadata:
+  created: "2025-08-20"
+  description: "Extension compatibility configuration for Libre WebUI modular system"
+  author: "Libre WebUI Stack"

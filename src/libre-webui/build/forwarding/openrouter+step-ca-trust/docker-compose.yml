@@ -1,0 +1,37 @@
+services:
+  libre-webui:
+    container_name: libre-webui
+    image: localhost/libre-webui
+    restart: unless-stopped
+    environment:
+      DOCKER_ENV: ${DOCKER_ENV:-true}
+      NODE_ENV: ${NODE_ENV:-production}
+      VITE_API_TIMEOUT: ${VITE_API_TIMEOUT:-300000}
+      PORT: ${PORT:-3001}
+      FRONTEND_PORT: ${FRONTEND_PORT:-5173}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:5173}
+      SINGLE_USER_MODE: ${SINGLE_USER_MODE:-false}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
+      JWT_SECRET: ${JWT_SECRET:-}
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY:-}
+      SESSION_SECRET: ${SESSION_SECRET:-}
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-"http://localhost:11434"}
+      OLLAMA_TIMEOUT: ${OLLAMA_TIMEOUT:-300000}
+      OLLAMA_LONG_OPERATION_TIMEOUT: ${OLLAMA_LONG_OPERATION_TIMEOUT:-900000}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
+      STEP_CA_TRUST: ${STEP_CA_TRUST:-true}
+      STEP_CA_TRUST_RESTART: ${STEP_CA_TRUST_RESTART:-true}
+    volumes:
+      - libre-webui-data:/app/backend/data
+      - libre-webui-plugins:/app/backend/plugins
+      - libre-webui-temp:/app/backend/temp
+    ports:
+      - 5173:5173
+      - 3001:3001
+volumes:
+  libre-webui-data:
+    name: libre-webui-data
+  libre-webui-plugins:
+    name: libre-webui-plugins
+  libre-webui-temp:
+    name: libre-webui-temp

@@ -1,0 +1,71 @@
+services:
+  libre-webui:
+    container_name: libre-webui
+    image: localhost/libre-webui
+    restart: unless-stopped
+    environment:
+      DOCKER_ENV: ${DOCKER_ENV:-true}
+      NODE_ENV: ${NODE_ENV:-production}
+      VITE_API_TIMEOUT: ${VITE_API_TIMEOUT:-300000}
+      PORT: ${PORT:-3001}
+      FRONTEND_PORT: ${FRONTEND_PORT:-5173}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:5173}
+      SINGLE_USER_MODE: ${SINGLE_USER_MODE:-false}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
+      JWT_SECRET: ${JWT_SECRET:-}
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY:-}
+      SESSION_SECRET: ${SESSION_SECRET:-}
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-"http://localhost:11434"}
+      OLLAMA_TIMEOUT: ${OLLAMA_TIMEOUT:-300000}
+      OLLAMA_LONG_OPERATION_TIMEOUT: ${OLLAMA_LONG_OPERATION_TIMEOUT:-900000}
+      VIRTUAL_PORT: ${VIRTUAL_PORT:-5173}
+      VIRTUAL_HOST: ${VIRTUAL_HOST}
+      LETSENCRYPT_HOST: ${LETSENCRYPT_HOST}
+      LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
+    volumes:
+      - libre-webui-data:/app/backend/data
+      - libre-webui-plugins:/app/backend/plugins
+      - libre-webui-temp:/app/backend/temp
+      - step-ca-vhost:/vhost.d
+    configs:
+      - source: vhost
+        target: ${LIBRE_WEBUI_VHOST_PATH:-/vhost.d/${VIRTUAL_HOST}}
+    networks:
+      - step-ca-network
+volumes:
+  libre-webui-data:
+    name: libre-webui-data
+  libre-webui-plugins:
+    name: libre-webui-plugins
+  libre-webui-temp:
+    name: libre-webui-temp
+  step-ca-vhost:
+    external: true
+configs:
+  vhost:
+    content: |
+      location ~ ^/api/(.*)$ {
+        proxy_pass http://libre-webui:${PORT:-3001};
+        proxy_set_header Host $$host;
+        proxy_set_header X-Real-IP $$remote_addr;
+        proxy_set_header X-Forwarded-For $$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $$scheme;
+        proxy_set_header X-Forwarded-Host $$host;
+      }
+      location ~ ^/ws(.*)$ {
+        proxy_pass http://libre-webui:${PORT:-3001};
+
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $$http_upgrade;
+        proxy_set_header Connection "upgrade";
+
+        proxy_set_header Host $$host;
+        proxy_set_header X-Real-IP $$remote_addr;
+        proxy_set_header X-Forwarded-For $$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $$scheme;
+        proxy_set_header X-Forwarded-Host $$host;
+      }
+networks:
+  step-ca-network:
+    external: true

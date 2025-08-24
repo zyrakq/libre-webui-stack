@@ -1,0 +1,47 @@
+services:
+  libre-webui:
+    environment:
+      VIRTUAL_PORT: ${VIRTUAL_PORT:-5173}
+      VIRTUAL_HOST: ${VIRTUAL_HOST}
+      LETSENCRYPT_HOST: ${LETSENCRYPT_HOST}
+      LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL}
+    volumes:
+      - step-ca-vhost:/vhost.d
+    configs:
+      - source: vhost
+        target: ${LIBRE_WEBUI_VHOST_PATH:-/vhost.d/${VIRTUAL_HOST}}
+    networks:
+      - step-ca-network
+
+volumes:
+  step-ca-vhost:
+    external: true
+
+configs:
+  vhost:
+    content: |
+      location ~ ^/api/(.*)$ {
+        proxy_pass http://libre-webui:${PORT:-3001};
+        proxy_set_header Host $$host;
+        proxy_set_header X-Real-IP $$remote_addr;
+        proxy_set_header X-Forwarded-For $$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $$scheme;
+        proxy_set_header X-Forwarded-Host $$host;
+      }
+      location ~ ^/ws(.*)$ {
+        proxy_pass http://libre-webui:${PORT:-3001};
+
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $$http_upgrade;
+        proxy_set_header Connection "upgrade";
+
+        proxy_set_header Host $$host;
+        proxy_set_header X-Real-IP $$remote_addr;
+        proxy_set_header X-Forwarded-For $$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $$scheme;
+        proxy_set_header X-Forwarded-Host $$host;
+      }
+
+networks:
+  step-ca-network:
+    external: true

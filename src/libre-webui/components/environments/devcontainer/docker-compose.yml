@@ -1,0 +1,8 @@
+services:
+  libre-webui:
+    networks:
+      - libre-webui-workspace-network
+
+networks:
+  libre-webui-workspace-network:
+    external: true
