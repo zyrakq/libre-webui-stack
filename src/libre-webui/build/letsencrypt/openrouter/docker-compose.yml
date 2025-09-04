@@ -23,6 +23,11 @@ services:
       LETSENCRYPT_HOST: ${LETSENCRYPT_HOST}
       LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL}
       OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: 10m
+        max-file: 3
     volumes:
       - libre-webui-data:/app/backend/data
       - libre-webui-plugins:/app/backend/plugins

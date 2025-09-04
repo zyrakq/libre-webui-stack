@@ -20,6 +20,11 @@ services:
       OLLAMA_LONG_OPERATION_TIMEOUT: ${OLLAMA_LONG_OPERATION_TIMEOUT:-900000}
       STEP_CA_TRUST: ${STEP_CA_TRUST:-true}
       STEP_CA_TRUST_RESTART: ${STEP_CA_TRUST_RESTART:-true}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: 10m
+        max-file: 3
     volumes:
       - libre-webui-data:/app/backend/data
       - libre-webui-plugins:/app/backend/plugins

@@ -19,6 +19,11 @@ services:
       OLLAMA_TIMEOUT: ${OLLAMA_TIMEOUT:-300000}
       OLLAMA_LONG_OPERATION_TIMEOUT: ${OLLAMA_LONG_OPERATION_TIMEOUT:-900000}
       OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: 10m
+        max-file: 3
     volumes:
       - libre-webui-data:/app/backend/data
       - libre-webui-plugins:/app/backend/plugins
